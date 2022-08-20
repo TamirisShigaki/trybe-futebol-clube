@@ -8,10 +8,16 @@ export default class LoginController {
   }
 
   public async login(req: Request, res: Response) {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    const result = await this.serviceL.login(email);
+    const result = await this.serviceL.login(email, password);
 
     return res.status(StatusCodes.OK).json({ token: result });
+  }
+
+  static validateLogin(req:Request, res:Response) {
+    const { user } = req.body;
+
+    return res.status(StatusCodes.OK).json({ role: user.data.role });
   }
 }
