@@ -11,4 +11,13 @@ export default class TeamService {
 
     return result;
   }
+
+  public async getIDTeam(id: number) {
+    const result = await this.modelT.findOne({
+      where: { id },
+      raw: true,
+    });
+
+    return result;
+  }
 }
