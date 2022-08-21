@@ -1,10 +1,12 @@
 import * as express from 'express';
-import MactheController from '../controllers/macthe.controller';
+import MatcheController from '../controllers/matche.controller';
+import Token from '../middlewares/auth/token';
 import 'express-async-errors';
 
 const router = express.Router();
-const mactheController = new MactheController();
+const matcheController = new MatcheController();
 
-router.get('/matches', (req, res) => mactheController.getMacthe(req, res));
+router.get('/matches', (req, res) => matcheController.getMatche(req, res));
+router.post('/matches', Token.validateToken, (req, res) => matcheController.createMatche(req, res));
 
 export default router;
