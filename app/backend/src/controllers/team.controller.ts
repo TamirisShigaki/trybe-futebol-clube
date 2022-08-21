@@ -7,8 +7,16 @@ export default class TeamController {
     this.serviceT = serviceT;
   }
 
-  public async getTeam(req: Request, res: Response) {
+  public async getTeam(_req: Request, res: Response) {
     const result = await this.serviceT.getTeam();
+
+    return res.status(StatusCodes.OK).json(result);
+  }
+
+  public async getIdTeam(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const result = await this.serviceT.getIDTeam(Number(id));
 
     return res.status(StatusCodes.OK).json(result);
   }
