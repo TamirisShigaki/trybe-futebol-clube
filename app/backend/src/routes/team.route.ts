@@ -1,5 +1,6 @@
 import * as express from 'express';
 import TeamController from '../controllers/team.controller';
+import 'express-async-errors';
 
 const router = express.Router();
 const teamController = new TeamController();

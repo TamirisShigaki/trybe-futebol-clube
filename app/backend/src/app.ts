@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as cors from 'cors';
 import routerLogin from './routes/login.route';
 import routerTeam from './routes/team.route';
+import routerMacthe from './routes/matche.route';
 import ErrorMiddleware from './middlewares/ErrorMiddleware';
 
 class App {
@@ -29,6 +30,7 @@ class App {
     this.app.use(cors());
     this.app.use(routerLogin);
     this.app.use(routerTeam);
+    this.app.use(routerMacthe);
 
     this.app.use(ErrorMiddleware);
   }
