@@ -29,4 +29,8 @@ export default class MatcheService {
 
     return result;
   }
+
+  public async setMatche(id: number) {
+    await this.modelM.update({ inProgress: false }, { where: { id } });
+  }
 }
