@@ -21,23 +21,20 @@ export default class MatcheService {
 
   public async createMatche(data: IMatche) {
     const { homeTeam, awayTeam, homeTeamGoals, awayTeamGoals } = data;
-
     if (homeTeam === awayTeam) {
       throw new CustomError(
         StatusCodes.UNAUTHORIZED,
         'It is not possible to create a match with two equal teams',
       );
     }
-
-    const result = await this.modelM.create({
-      homeTeam,
-      homeTeamGoals,
-      awayTeam,
-      awayTeamGoals,
-      inProgress: true,
-    });
-
-    return result;
+    try {
+      const result = await this.modelM.create({
+        homeTeam, homeTeamGoals, awayTeam, awayTeamGoals, inProgress: true,
+      });
+      return result;
+    } catch (error) {
+      throw new CustomError(StatusCodes.NOT_FOUND, 'There is no team with such id!');
+    }
   }
 
   public async setMatche(id: number) {
