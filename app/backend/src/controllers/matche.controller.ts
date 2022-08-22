@@ -18,4 +18,11 @@ export default class MatcheController {
 
     return res.status(StatusCodes.CREATED).json(result);
   }
+
+  public async setMatche(req: Request, res: Response) {
+    const { id } = req.params;
+
+    await this.serviceM.setMatche(Number(id));
+    res.status(200).json({ message: 'Finished' });
+  }
 }
