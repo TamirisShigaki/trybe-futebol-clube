@@ -40,4 +40,23 @@ export default class MatcheService {
   public async setMatche(id: number) {
     await this.modelM.update({ inProgress: false }, { where: { id } });
   }
+
+  public async updateMatche(
+    id: number,
+    homeTeamGoals: number,
+    awayTeamGoals: number,
+  ) {
+    const result = await this.modelM.findByPk(id);
+
+    if (!result) {
+      throw new CustomError(
+        StatusCodes.UNAUTHORIZED,
+        'There is no match with this ID',
+      );
+    }
+
+    await this.modelM.update({
+      homeTeamGoals, awayTeamGoals,
+    }, { where: { id } });
+  }
 }
