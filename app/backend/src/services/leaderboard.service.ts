@@ -1,16 +1,14 @@
-// import { StatusCodes } from 'http-status-codes';
-// import CustomError from '../middlewares/CustomError';
 import Matches from '../database/models/matches';
-import Teams from '../database/models/teams';
+import Team from '../database/models/teams';
 import Calculator from '../utils/calculator';
 
 export default class LeaderBoardService {
-  constructor(private modelT = Teams) {
-    this.modelT = modelT;
+  constructor(private model = Team) {
+    this.model = model;
   }
 
-  public async table() {
-    const result = await this.modelT.findAll(
+  public async table(location: string) {
+    const result = await this.model.findAll(
       {
         attributes: ['teamName'],
         include: [
@@ -21,12 +19,10 @@ export default class LeaderBoardService {
           { model: Matches,
             as: 'awayTeam',
             where: { inProgress: false },
-            attributes: ['homeTeamGoals', 'awayTeamGoals'] },
-        ],
+            attributes: ['homeTeamGoals', 'awayTeamGoals'] }],
       },
     );
-
-    const table = Calculator.calOrder(result, 'home');
+    const table = Calculator.calOrder(result, location);
     return table;
   }
 }
