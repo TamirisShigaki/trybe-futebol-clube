@@ -8,7 +8,7 @@ export default class Calculator {
       totalDraws: Calculator.calDraws(team, location),
       totalLosses: Calculator.calLosses(team, location),
       goalsFavor: Calculator.calGoalFavor(team, location),
-      goalsOwn: Calculator.calGoalOwn(team, location),
+      goalsOwn: Calculator.calGoalsOwn(team, location),
       goalsBalance: Calculator.calGoalBalance(team, location),
       efficiency: Calculator.calEfficiency(team, location),
     }));
@@ -17,114 +17,119 @@ export default class Calculator {
   }
 
   static calGames(team: any, location: string) {
-    const gameHome = [
+    const homeGame = [
       ...team.homeTeam.map((play: any) => play.homeTeamGoals),
     ].length;
-    const gameAway = [
+    const awayGame = [
       ...team.awayTeam.map((play: any) => play.awayTeamGoals),
     ].length;
 
-    if (location === 'home') return gameHome;
-    return gameAway;
+    if (location === 'home') return homeGame;
+    if (location === 'away') return awayGame;
+    return homeGame + awayGame;
   }
 
-  static calVictories(team:any, location: string) {
-    const winHome = team.homeTeam
-      .reduce((wins: any, play: any) => play.homeTeamGoals > play.awayTeamGoals && wins + 1, 0);
-    const winAway = team.awayTeam
-      .reduce((wins: any, play: any) => play.awayTeamGoals < play.homeTeamGoals && wins + 1, 0);
+  static calVictories(team: any, location: string) {
+    const homeWin = team.homeTeam
+      .reduce((wins: any, play: any) => (play.homeTeamGoals > play.awayTeamGoals
+        ? wins + 1 : wins + 0), 0);
+    const awayWin = team.awayTeam
+      .reduce((wins: any, play: any) => (play.awayTeamGoals > play.homeTeamGoals
+        ? wins + 1 : wins + 0), 0);
 
     switch (location) {
       case 'home':
-        return !winHome ? 0 : winHome;
+        return !homeWin ? 0 : homeWin;
       case 'away':
-        return !winAway ? 0 : winAway;
+        return !awayWin ? 0 : awayWin;
       default:
-        break;
+        return homeWin + awayWin;
     }
   }
 
   static calLosses(team: any, location: string) {
-    const losehome = team.homeTeam
-      .reduce((lose: any, play: any) => play.homeTeamGoals < play.awayTeamGoals && lose + 1, 0);
-    const loseAway = team.homeTeam
-      .reduce((lose: any, play: any) => play.awayTeamGoals < play.homeTeamGoals && lose + 1, 0);
+    const homeLose = team.homeTeam
+      .reduce((lose: any, play: any) => (play.awayTeamGoals > play.homeTeamGoals
+        ? lose + 1 : lose + 0), 0);
+    const awayLose = team.awayTeam
+      .reduce((lose: any, play: any) => (play.homeTeamGoals > play.awayTeamGoals
+        ? lose + 1 : lose + 0), 0);
 
     switch (location) {
       case 'home':
-        return !losehome ? 0 : losehome;
+        return !homeLose ? 0 : homeLose;
       case 'away':
-        return !loseAway ? 0 : loseAway;
+        return !awayLose ? 0 : awayLose;
       default:
-        break;
+        return homeLose + awayLose;
     }
   }
 
   static calDraws(team: any, location: string) {
-    const drawHome = team.homeTeam
-      .reduce((draw: any, play: any) => play.homeTeamGoals === play.awayTeamGoals && draw + 1, 0);
-    const drawAway = team.homeTeam
-      .reduce((draw: any, play: any) => play.awayTeamGoals === play.homeTeamGoals && draw + 1, 0);
-
-    switch (location) {
-      case 'home':
-        return !drawHome ? 0 : drawHome;
-      case 'away':
-        return !drawAway ? 0 : drawAway;
-      default:
-        break;
-    }
+    return Calculator.calGames(team, location)
+          - (Calculator.calVictories(team, location)
+          + Calculator.calLosses(team, location));
   }
 
   static calGoalFavor(team: any, location: string) {
-    const goalsHome = team.homeTeam
+    const homeGoals = team.homeTeam
       .reduce((goals: any, play: any) => goals + play.homeTeamGoals, 0);
-    const goalsAway = team.homeTeam
+    const awayGoals = team.awayTeam
       .reduce((goals: any, play: any) => goals + play.awayTeamGoals, 0);
 
     switch (location) {
       case 'home':
-        return goalsHome;
+        return homeGoals;
       case 'away':
-        return goalsAway;
+        return awayGoals;
       default:
-        break;
+        return homeGoals + awayGoals;
     }
   }
 
-  static calGoalOwn(team: any, location: string) {
-    const goalsHome = team.homeTeam
+  static calGoalsOwn(team: any, location: string) {
+    const homeGoals = team.homeTeam
       .reduce((goals: any, play: any) => goals + play.awayTeamGoals, 0);
-    const goalsAway = team.homeTeam
+    const awayGoals = team.awayTeam
       .reduce((goals: any, play: any) => goals + play.homeTeamGoals, 0);
 
     switch (location) {
       case 'home':
-        return goalsHome;
+        return homeGoals;
       case 'away':
-        return goalsAway;
+        return awayGoals;
       default:
-        break;
+        return homeGoals + awayGoals;
     }
   }
 
   static calGoalBalance(team: any, location: string) {
-    const balance = Calculator.calGoalFavor(team, location) - Calculator.calGoalOwn(team, location);
-
+    const balance = Calculator.calGoalFavor(team, location)
+      - Calculator.calGoalsOwn(team, location);
     return balance;
   }
 
   static calPoints(team: any, location: string) {
-    const winPoints = Calculator.calGoalFavor(team, location) * 3;
-    const drawoints = Calculator.calGoalOwn(team, location);
-
-    return winPoints + drawoints;
+    const winPoints = Calculator.calVictories(team, location) * 3;
+    const drawPoints = Calculator.calDraws(team, location);
+    return winPoints + drawPoints;
   }
 
   static calEfficiency(team: any, location: string) {
     const efficiency = (Calculator.calPoints(team, location)
-    / (Calculator.calGames(team, location) * 3)) * 100;
-
+      / (Calculator.calGames(team, location) * 3)) * 100;
     return efficiency.toFixed(2);
+  }
+
+  static calOrder(team: any, location: string) {
+    const order = Calculator.table(team, location)
+      .sort((a: any, b: any) => {
+        if (b.totalPoints - a.totalPoints !== 0) return b.totalPoints - a.totalPoints;
+        if (b.totalVictories - a.totalVictories !== 0) return b.totalVictories - a.totalVictories;
+        if (b.goalsBalance - a.goalsBalance !== 0) return b.goalsBalance - a.goalsBalance;
+        if (b.goalsFavor - a.goalsFavor !== 0) return b.goalsFavor - a.goalsFavor;
+        return b.goalsOwn - a.goalsOwn;
+      });
+    return order;
   }
 }
