@@ -1,6 +1,10 @@
+import ITeam from '../interfaces/team.interfaces';
+import IPlay from '../interfaces/play.interface';
+import ITable from '../interfaces/table.interfaces';
+
 export default class Calculator {
-  static table(data: any, location: string) {
-    const table = data.map((team: any) => ({
+  static table(data: ITeam[], location: string) {
+    const table = data.map((team: ITeam) => ({
       name: team.teamName,
       totalPoints: Calculator.calPoints(team, location),
       totalGames: Calculator.calGames(team, location),
@@ -16,12 +20,12 @@ export default class Calculator {
     return table;
   }
 
-  static calGames(team: any, location: string) {
+  static calGames(team: ITeam, location: string) {
     const homeGame = [
-      ...team.homeTeam.map((play: any) => play.homeTeamGoals),
+      ...team.homeTeam.map((play: IPlay) => play.homeTeamGoals),
     ].length;
     const awayGame = [
-      ...team.awayTeam.map((play: any) => play.awayTeamGoals),
+      ...team.awayTeam.map((play: IPlay) => play.awayTeamGoals),
     ].length;
 
     if (location === 'home') return homeGame;
@@ -29,12 +33,12 @@ export default class Calculator {
     return homeGame + awayGame;
   }
 
-  static calVictories(team: any, location: string) {
+  static calVictories(team: ITeam, location: string) {
     const homeWin = team.homeTeam
-      .reduce((wins: any, play: any) => (play.homeTeamGoals > play.awayTeamGoals
+      .reduce((wins: number, play: IPlay) => (play.homeTeamGoals > play.awayTeamGoals
         ? wins + 1 : wins + 0), 0);
     const awayWin = team.awayTeam
-      .reduce((wins: any, play: any) => (play.awayTeamGoals > play.homeTeamGoals
+      .reduce((wins: number, play: IPlay) => (play.awayTeamGoals > play.homeTeamGoals
         ? wins + 1 : wins + 0), 0);
 
     switch (location) {
@@ -47,12 +51,12 @@ export default class Calculator {
     }
   }
 
-  static calLosses(team: any, location: string) {
+  static calLosses(team: ITeam, location: string) {
     const homeLose = team.homeTeam
-      .reduce((lose: any, play: any) => (play.awayTeamGoals > play.homeTeamGoals
+      .reduce((lose: number, play: IPlay) => (play.awayTeamGoals > play.homeTeamGoals
         ? lose + 1 : lose + 0), 0);
     const awayLose = team.awayTeam
-      .reduce((lose: any, play: any) => (play.homeTeamGoals > play.awayTeamGoals
+      .reduce((lose: number, play: IPlay) => (play.homeTeamGoals > play.awayTeamGoals
         ? lose + 1 : lose + 0), 0);
 
     switch (location) {
@@ -65,17 +69,18 @@ export default class Calculator {
     }
   }
 
-  static calDraws(team: any, location: string) {
+  static calDraws(team: ITeam, location: string) {
     return Calculator.calGames(team, location)
           - (Calculator.calVictories(team, location)
           + Calculator.calLosses(team, location));
   }
 
-  static calGoalFavor(team: any, location: string) {
+  static calGoalFavor(team: ITeam, location: string) {
     const homeGoals = team.homeTeam
-      .reduce((goals: any, play: any) => goals + play.homeTeamGoals, 0);
+      .reduce((goals: number, play:
+      IPlay) => goals + play.homeTeamGoals, 0);
     const awayGoals = team.awayTeam
-      .reduce((goals: any, play: any) => goals + play.awayTeamGoals, 0);
+      .reduce((goals: number, play: IPlay) => goals + play.awayTeamGoals, 0);
 
     switch (location) {
       case 'home':
@@ -87,11 +92,11 @@ export default class Calculator {
     }
   }
 
-  static calGoalsOwn(team: any, location: string) {
+  static calGoalsOwn(team: ITeam, location: string) {
     const homeGoals = team.homeTeam
-      .reduce((goals: any, play: any) => goals + play.awayTeamGoals, 0);
+      .reduce((goals: number, play: IPlay) => goals + play.awayTeamGoals, 0);
     const awayGoals = team.awayTeam
-      .reduce((goals: any, play: any) => goals + play.homeTeamGoals, 0);
+      .reduce((goals: number, play: IPlay) => goals + play.homeTeamGoals, 0);
 
     switch (location) {
       case 'home':
@@ -103,27 +108,27 @@ export default class Calculator {
     }
   }
 
-  static calGoalBalance(team: any, location: string) {
+  static calGoalBalance(team: ITeam, location: string) {
     const balance = Calculator.calGoalFavor(team, location)
       - Calculator.calGoalsOwn(team, location);
     return balance;
   }
 
-  static calPoints(team: any, location: string) {
+  static calPoints(team: ITeam, location: string) {
     const winPoints = Calculator.calVictories(team, location) * 3;
     const drawPoints = Calculator.calDraws(team, location);
     return winPoints + drawPoints;
   }
 
-  static calEfficiency(team: any, location: string) {
+  static calEfficiency(team: ITeam, location: string) {
     const efficiency = (Calculator.calPoints(team, location)
       / (Calculator.calGames(team, location) * 3)) * 100;
     return efficiency.toFixed(2);
   }
 
-  static calOrder(team: any, location: string) {
+  static calOrder(team: ITeam[], location: string) {
     const order = Calculator.table(team, location)
-      .sort((a: any, b: any) => {
+      .sort((a: ITable, b: ITable) => {
         if (b.totalPoints - a.totalPoints !== 0) return b.totalPoints - a.totalPoints;
         if (b.totalVictories - a.totalVictories !== 0) return b.totalVictories - a.totalVictories;
         if (b.goalsBalance - a.goalsBalance !== 0) return b.goalsBalance - a.goalsBalance;

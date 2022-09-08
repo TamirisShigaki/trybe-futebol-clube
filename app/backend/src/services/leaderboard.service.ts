@@ -1,6 +1,7 @@
 import Matches from '../database/models/matches';
 import Team from '../database/models/teams';
 import Calculator from '../utils/calculator';
+import ITeam from '../interfaces/team.interfaces';
 
 export default class LeaderBoardService {
   constructor(private model = Team) {
@@ -22,7 +23,7 @@ export default class LeaderBoardService {
             attributes: ['homeTeamGoals', 'awayTeamGoals'] }],
       },
     );
-    const table = Calculator.calOrder(result, location);
+    const table = Calculator.calOrder(result as unknown as ITeam[], location);
     return table;
   }
 }
